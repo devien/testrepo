@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <script type="text/javascript">
+          // set the pyodide files URL (packages.json, pyodide.asm.data etc)
+          window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.16.1/full/';
+      </script>
+      <script src="https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js"></script>
+  </head>
+  <body>
+    Pyodide test page
+    <script type="text/javascript">
+      languagePluginLoader.then(function () {
+            pyodide.runPython(`
+            import os
+            import shutil
+            import pyodide
+            import zipfile
+            import gzip
+            from js import XMLHttpRequest, Blob
+            file = pyodide.open_url('https://raw.github.com/amygrr/t_mod/main/example.docx')
+            print(type(file))
+            file.seek(0)
+            string = file.read()
+            print(type(string))
+            compressed_value = gzip.compress(bytes(string,'utf-8'))
+            print(type(compressed_value))              
+            req = XMLHttpRequest.new()
+            req.open("PUT", "https://apigithub.com/repos/amygrr/t_mod/contents/example.zip", False, 'amygrr', '4abedc9238399b64035faf2d2320660b670076420')
+            req.setRequestHeader('Authorization', '4abedc9238399b64035faf2d2320660b67007642')              
+            blob = Blob.new([compressed_value], {type : 'text/plain'})
+            req.send(blob)
+            str(req.response)              
+            `);
+    });
+</script>
+  </body>
+</html>
